@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "labyrinthos"
+version = "0.1.0"
+description = "Spatial File Encoding Engine — files become mazes; paths become reversible storage"
+authors = [{name="Aradhya Mishra", email="officialaradhyamishra1@gmail.com"}]
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.9"
+dependencies = [
+    "numpy>=1.21",
+    "Pillow>=9.0",
+]
+keywords = ["storage", "maze", "encoding", "experimental"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+]
+
+[project.scripts]
+labyrinthos = "labyrinthos.cli:main"
+
+[tool.setuptools.packages]
+find = {}
+
+[tool.setuptools.package-dir]
+"" = "src"

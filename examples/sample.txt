@@ -1,0 +1,6 @@
+Hello, LabyrinthOS!
+This is a test file for the spatial encoding engine.
+"""
+The system will turn these bytes into a deterministic maze.
+Different content produces different mazes.
+"""
