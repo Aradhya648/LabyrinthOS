@@ -45,14 +45,9 @@ export default function Home() {
       const encResult = encode(buf, password || undefined);
       const recovered = decode(encResult.maze, password || undefined);
 
-      const recoveredBuf = recovered.buffer.slice(
-        recovered.byteOffset,
-        recovered.byteOffset + recovered.byteLength
-      );
-
       const [origHash, recHash] = await Promise.all([
         sha256(buf),
-        sha256(recoveredBuf),
+        sha256(recovered),
       ]);
 
       setResult({
