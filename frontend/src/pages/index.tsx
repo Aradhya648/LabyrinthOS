@@ -45,9 +45,13 @@ export default function Home() {
       const encResult = encode(buf, password || undefined);
       const recovered = decode(encResult.maze, password || undefined);
 
+      // Copy into a clean ArrayBuffer for strict TS compat with crypto.subtle
+      const recoveredBuf = new ArrayBuffer(recovered.length);
+      new Uint8Array(recoveredBuf).set(recovered);
+
       const [origHash, recHash] = await Promise.all([
         sha256(buf),
-        sha256(recovered),
+        sha256(recoveredBuf),
       ]);
 
       setResult({
