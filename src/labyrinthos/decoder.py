@@ -1,26 +1,15 @@
-from .file_ingestion import bitstream_to_bytes
-from .crypto import decrypt_bits
+from .maze_generator import decode_maze
+import hashlib
+from typing import Optional, List
 
-def decode_bits_from_maze(maze: list, password: str = None) -> bytes:
-    """
-    Extract bits from the maze and reconstruct original file bytes.
-    For corridor maze: bits are in top row (row 0) from col 1 to width-2.
-    """
-    if not maze or len(maze) < 2:
-        raise ValueError("Invalid maze")
-    width = len(maze[0])
-    bits = []
-    for x in range(1, width-1):
-        bit = maze[0][x] & 1
-        bits.append(bit)
-    if password:
-        bits = decrypt_bits(bits, password)
-    return bitstream_to_bytes(iter(bits))
+def decode_bits_from_maze(maze: List[List[int]], password: Optional[str] = None) -> bytes:
+    """Reconstruct original file bytes from maze."""
+    return decode_maze(maze, password=password)
 
-def validate(maze: list, original_data: bytes, password: str = None) -> bool:
+def validate(maze: List[List[int]], original_data: bytes, password: Optional[str] = None) -> bool:
+    """Verify round-trip correctness via SHA256."""
     try:
         recovered = decode_bits_from_maze(maze, password=password)
-        import hashlib
         h1 = hashlib.sha256(original_data).hexdigest()
         h2 = hashlib.sha256(recovered).hexdigest()
         return h1 == h2

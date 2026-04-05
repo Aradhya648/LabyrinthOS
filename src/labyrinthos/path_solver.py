@@ -2,33 +2,28 @@ from collections import deque
 from typing import List, Tuple
 
 def solve_maze(maze: List[List[int]]) -> List[Tuple[int, int]]:
-    """
-    BFS shortest path from entry (1,0) to exit (h-2, w-1).
-    Returns list of coordinates from entry to exit inclusive.
-    """
-    height = len(maze)
-    width = len(maze[0]) if height > 0 else 0
+    """BFS shortest path from entry (1,0) to exit (H-2, W-1)."""
+    H = len(maze)
+    W = len(maze[0]) if H > 0 else 0
     start = (1, 0)
-    goal = (height-2, width-1)
+    goal = (H - 2, W - 1)
 
-    # BFS
+    visited = {start: None}
     queue = deque([start])
-    visited = {start: None}  # parent map
 
     while queue:
         y, x = queue.popleft()
         if (y, x) == goal:
             break
-        for dy, dx in [(1,0),(-1,0),(0,1),(0,-1)]:
-            ny, nx = y+dy, x+dx
-            if 0 <= ny < height and 0 <= nx < width and maze[ny][nx] == 0 and (ny,nx) not in visited:
-                visited[(ny,nx)] = (y,x)
-                queue.append((ny,nx))
+        for dy, dx in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+            ny, nx = y + dy, x + dx
+            if 0 <= ny < H and 0 <= nx < W and maze[ny][nx] == 0 and (ny, nx) not in visited:
+                visited[(ny, nx)] = (y, x)
+                queue.append((ny, nx))
 
     if goal not in visited:
-        raise RuntimeError("No path found")
+        raise RuntimeError("No path found from entry to exit")
 
-    # Reconstruct path
     path = []
     cur = goal
     while cur is not None:
