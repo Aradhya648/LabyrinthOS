@@ -9,7 +9,5 @@ export function computeRatio(originalBytes: number, maze: number[][]): {
   const height = maze.length;
   const width = maze[0]?.length ?? 0;
   const mazeCells = height * width;
-  const mazeBits = mazeCells;
-  const ratio = originalBits / mazeBits;
-  return { originalBytes, originalBits, mazeCells, mazeBits, ratio };
+  return { originalBytes, originalBits, mazeCells, mazeBits: mazeCells, ratio: originalBits / mazeCells };
 }

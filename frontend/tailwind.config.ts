@@ -1,24 +1,21 @@
-import type { Config } from 'tailwindcss'
+import type { Config } from 'tailwindcss';
 
 const config: Config = {
   content: [
-    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/pages/**/*.{js,ts,jsx,tsx}',
+    './src/components/**/*.{js,ts,jsx,tsx}',
   ],
-  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        background: '#0a0a0a',
-        surface: '#171717',
-        primary: '#3b82f6',
+        bg: '#050505',
+        surface: '#0f0f0f',
+        accent: '#06b6d4',
         success: '#10b981',
-        warning: '#f59e0b',
-        text: '#ededed',
-        muted: '#a3a3a3',
+        muted: '#71717a',
       },
     },
   },
   plugins: [],
-}
-export default config
+};
+export default config;
