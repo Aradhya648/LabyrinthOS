@@ -1,4 +1,4 @@
-import pako from 'pako';
+import { deflate, inflate } from 'pako';
 
 // ============================================================
 // LabyrinthOS v2 — Spanning Tree Maze with Data Encoding
@@ -229,7 +229,7 @@ export function encode(fileData: ArrayBuffer, password?: string): EncodeResult {
   const originalSize = raw.length;
 
   // 1. Compress
-  const compressed = pako.deflate(raw);
+  const compressed = deflate(raw);
   const compressedSize = compressed.length;
 
   // 2. Encrypt
@@ -340,9 +340,11 @@ export function decode(maze: number[][], password?: string): Uint8Array {
   // Decrypt
   const compressed = password ? xorCrypt(processed, password) : processed;
 
-  // Decompress
-  const raw = pako.inflate(compressed);
-  return raw.slice(0, originalSize);
+  // Decompress and copy into a fresh ArrayBuffer-backed Uint8Array
+  const raw = inflate(compressed);
+  const result = new Uint8Array(originalSize);
+  result.set(raw.subarray(0, originalSize));
+  return result;
 }
 
 // ============================================================

@@ -71,7 +71,9 @@ export default function Home() {
     if (!result) return;
     try {
       const recovered = decode(result.maze, password || undefined);
-      const blob = new Blob([recovered]);
+      const buf = new ArrayBuffer(recovered.length);
+      new Uint8Array(buf).set(recovered);
+      const blob = new Blob([buf]);
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
