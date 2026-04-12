@@ -93,10 +93,10 @@ export default function Home() {
           LABYRINTHOS
         </h1>
         <p className="mt-3 text-base sm:text-lg text-zinc-400 max-w-xl mx-auto">
-          Files become mazes. Paths become reversible storage.
+          Files become geometric patterns. Bytes become maze blocks.
         </p>
         <p className="mt-1 text-sm text-zinc-600 max-w-md mx-auto">
-          Upload a file. Watch it become a deterministic maze. Recover it exactly.
+          Each byte encodes as a unique 3×3 pattern. Upload a file and watch your data become geometry.
         </p>
       </header>
 
@@ -172,7 +172,7 @@ export default function Home() {
           {/* Center: Maze */}
           <div className="min-h-[420px] lg:min-h-[520px]">
             {result ? (
-              <MazeCanvas maze={result.maze} path={result.path} />
+              <MazeCanvas maze={result.maze} path={result.path} blockRows={result.blockRows} blockCols={result.blockCols} />
             ) : (
               <div className="h-full min-h-[420px] rounded-xl border border-dashed border-[#1a1a1a] bg-[#070707] flex items-center justify-center">
                 <p className="text-zinc-700 text-sm">Generate a maze to visualize</p>
@@ -197,13 +197,19 @@ export default function Home() {
                     sub={`${(result.compressionRatio * 100).toFixed(1)}% of original`}
                   />
                   <Metric
+                    label="Block Grid"
+                    value={`${result.blockRows} \u00d7 ${result.blockCols}`}
+                    sub={`${result.blocksUsed.toLocaleString()} blocks used`}
+                  />
+                  <Metric
                     label="Maze"
                     value={`${result.mazeWidth} \u00d7 ${result.mazeHeight}`}
                     sub={`${(result.mazeWidth * result.mazeHeight).toLocaleString()} cells`}
                   />
                   <Metric
-                    label="Path Length"
-                    value={`${result.pathLength.toLocaleString()} steps`}
+                    label="Data Density"
+                    value={`${(result.bitsPerCell * 100).toFixed(1)}% bits/cell`}
+                    sub="v3 geometric encoding"
                   />
                   <Metric
                     label="Solve Time"
@@ -243,10 +249,10 @@ export default function Home() {
       {/* Step explainer */}
       <section className="px-6 py-8 border-t border-[#111]">
         <div className="max-w-3xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-3">
-          <Step num={1} text="File becomes binary" />
-          <Step num={2} text="Binary shapes maze" />
-          <Step num={3} text="Shortest path encodes storage" />
-          <Step num={4} text="Path reconstructs original file" />
+          <Step num={1} text="File is compressed + encrypted" />
+          <Step num={2} text="Each byte becomes a 3×3 block pattern" />
+          <Step num={3} text="Block grid forms a solvable maze" />
+          <Step num={4} text="Patterns decode back to exact bytes" />
         </div>
       </section>
 

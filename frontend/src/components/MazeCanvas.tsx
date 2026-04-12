@@ -3,35 +3,65 @@ import React, { useRef, useEffect } from 'react';
 interface Props {
   maze: number[][];
   path: [number, number][];
+  blockRows?: number;
+  blockCols?: number;
 }
 
-const WALL_COLOR = '#1e293b';
-const PASSAGE_COLOR = '#08080a';
-const ENTRY_COLOR = '#3b82f6';
-const EXIT_COLOR = '#3b82f6';
+// Colors
+const WALL_COLOR     = '#1e293b';
+const PASSAGE_COLOR  = '#08080a';
+const CENTER_COLOR   = '#0d1f2d'; // block centers — subtle teal tint
+const CORRIDOR_COLOR = '#0a1520'; // inter-block corridors — slightly visible
+const ENTRY_COLOR    = '#3b82f6';
+const EXIT_COLOR     = '#3b82f6';
 
-export default function MazeCanvas({ maze, path }: Props) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+export default function MazeCanvas({ maze, path, blockRows, blockCols }: Props) {
+  const canvasRef   = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
+    const canvas    = canvasRef.current;
     const container = containerRef.current;
     if (!canvas || !container) return;
 
-    const ctx = canvas.getContext('2d')!;
-    const mazeH = maze.length;
-    const mazeW = maze[0].length;
+    const ctx    = canvas.getContext('2d')!;
+    const mazeH  = maze.length;
+    const mazeW  = maze[0].length;
 
-    const maxDim = Math.min(container.clientWidth, container.clientHeight || 600);
+    const maxDim  = Math.min(container.clientWidth, container.clientHeight || 600);
     const cellSize = Math.max(1, Math.min(10, Math.floor(maxDim / Math.max(mazeW, mazeH))));
 
-    canvas.width = mazeW * cellSize;
+    canvas.width  = mazeW * cellSize;
     canvas.height = mazeH * cellSize;
 
-    // Clear
+    // Fill background
     ctx.fillStyle = PASSAGE_COLOR;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Build lookup sets for block centers and corridor cells (for v3 coloring)
+    const centerSet   = new Set<number>();
+    const corridorSet = new Set<number>();
+
+    if (blockRows && blockCols) {
+      for (let br = 0; br < blockRows; br++) {
+        for (let bc = 0; bc < blockCols; bc++) {
+          // Center
+          const cr = 4 * br + 2;
+          const cc = 4 * bc + 2;
+          centerSet.add(cr * mazeW + cc);
+          // Horizontal corridor to right
+          if (bc + 1 < blockCols) {
+            const [hor, hoc] = [4 * br + 2, 4 * bc + 4];
+            corridorSet.add(hor * mazeW + hoc);
+          }
+          // Vertical corridor below
+          if (br + 1 < blockRows) {
+            const [vor, voc] = [4 * br + 4, 4 * bc + 2];
+            corridorSet.add(vor * mazeW + voc);
+          }
+        }
+      }
+    }
 
     // Animation state
     let rowsDone = 0;
@@ -44,10 +74,22 @@ export default function MazeCanvas({ maze, path }: Props) {
     function drawRows(start: number, end: number) {
       for (let y = start; y < end && y < mazeH; y++) {
         for (let x = 0; x < mazeW; x++) {
-          if (maze[y][x] === 1) {
-            ctx.fillStyle = WALL_COLOR;
-            ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+          const cell = maze[y][x];
+          const idx  = y * mazeW + x;
+
+          let color: string;
+          if (cell === 1) {
+            color = WALL_COLOR;
+          } else if (centerSet.has(idx)) {
+            color = CENTER_COLOR;
+          } else if (corridorSet.has(idx)) {
+            color = CORRIDOR_COLOR;
+          } else {
+            color = PASSAGE_COLOR;
           }
+
+          ctx.fillStyle = color;
+          ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
         }
       }
     }
@@ -56,8 +98,7 @@ export default function MazeCanvas({ maze, path }: Props) {
       for (let i = start; i < end && i < path.length; i++) {
         const [py, px] = path[i];
         const t = path.length > 1 ? i / (path.length - 1) : 0;
-        const hue = 187 - t * 27;
-        ctx.fillStyle = `hsl(${hue}, 80%, 55%)`;
+        ctx.fillStyle = `hsl(${187 - t * 27}, 80%, 55%)`;
         ctx.fillRect(px * cellSize, py * cellSize, cellSize, cellSize);
       }
     }
@@ -70,9 +111,9 @@ export default function MazeCanvas({ maze, path }: Props) {
         if (rowsDone >= mazeH) {
           // Entry / exit markers
           ctx.fillStyle = ENTRY_COLOR;
-          ctx.fillRect(0, cellSize, cellSize, cellSize);
+          ctx.fillRect(0, 2 * cellSize, cellSize, cellSize);
           ctx.fillStyle = EXIT_COLOR;
-          ctx.fillRect((mazeW - 1) * cellSize, (mazeH - 2) * cellSize, cellSize, cellSize);
+          ctx.fillRect((mazeW - 1) * cellSize, (mazeH - 3) * cellSize, cellSize, cellSize);
           phase = 'path';
         }
         animId = requestAnimationFrame(animate);
@@ -90,7 +131,7 @@ export default function MazeCanvas({ maze, path }: Props) {
 
     animId = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(animId);
-  }, [maze, path]);
+  }, [maze, path, blockRows, blockCols]);
 
   return (
     <div
