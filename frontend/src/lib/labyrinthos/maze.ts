@@ -197,6 +197,7 @@ export interface EncodeResult {
   totalTimeMs: number;
   version: 'v3';
   bitsPerCell: number;
+  avgEntropy: number; // 0–8: average bits of entropy per block
 }
 
 // ============================================================
@@ -291,6 +292,15 @@ export function encode(fileData: ArrayBuffer, password?: string): EncodeResult {
   maze[2][0] = 0;                              // left border → block(0,0) mid-left [forced]
   maze[4 * (bRows - 1) + 2][mazeW - 1] = 0;   // right border ← last block mid-right [forced]
 
+  // Compute average block entropy (popcount of 8-cell pattern, averaged)
+  let totalPopcount = 0;
+  for (let bi = 0; bi < bRows * bCols; bi++) {
+    const br = (bi / bCols) | 0, bc = bi % bCols;
+    const cells = blockDataCells(br, bc);
+    for (let ci = 0; ci < 8; ci++) totalPopcount += maze[cells[ci][0]][cells[ci][1]] & 1;
+  }
+  const avgEntropy = totalPopcount / (bRows * bCols); // 0–8 scale
+
   // Solve
   const tSolve = performance.now();
   const path = solveMaze(maze);
@@ -308,6 +318,7 @@ export function encode(fileData: ArrayBuffer, password?: string): EncodeResult {
     pathLength: path.length, solveTimeMs, totalTimeMs,
     version: 'v3',
     bitsPerCell: numBits / (mazeH * mazeW),
+    avgEntropy,
   };
 }
 

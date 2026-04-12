@@ -212,6 +212,12 @@ export default function Home() {
                     sub="v3 geometric encoding"
                   />
                   <Metric
+                    label="Block Entropy"
+                    value={`${result.avgEntropy.toFixed(2)} / 8 bits`}
+                    sub={result.avgEntropy > 5 ? 'high entropy — random/encrypted' : result.avgEntropy < 3 ? 'low entropy — structured data' : 'medium entropy'}
+                    accent={result.avgEntropy > 5 ? undefined : undefined}
+                  />
+                  <Metric
                     label="Solve Time"
                     value={`${result.solveTimeMs.toFixed(1)} ms`}
                     sub={`${result.totalTimeMs.toFixed(0)} ms total`}
