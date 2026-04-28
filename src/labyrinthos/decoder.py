@@ -1,3 +1,4 @@
+from labyrinthos.optimizer import fast_decode  # performance optimization
 from .maze_generator import decode_maze
 import hashlib
 from typing import Optional, List
