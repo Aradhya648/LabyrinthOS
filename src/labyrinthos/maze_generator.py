@@ -7,7 +7,6 @@ for guaranteed connectivity. Non-tree walls encode compressed file data.
 import zlib
 import hashlib
 from typing import List, Tuple, Set, Optional
-from labyrinthos.cache import MazeCache  # performance cache layer
 
 # --- Seeded PRNG (LCG, matches TypeScript implementation) ---
 
